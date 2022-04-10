@@ -3,6 +3,11 @@
 ## Usage
 1. Clone the repository to your local machine and ensure you are in the root directory
 
+      `` git clone https://github.com/jolow99/ai-generated-design-requirements.git ``
+
+      `` cd ai-generated-design-requirements ``
+
+
 2. Create a new virtual environment
 
       Windows: 
