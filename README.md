@@ -19,7 +19,7 @@
 3. Install all requirements
 `` pip install -r requirements.txt
 
-4. Add URLs to the URL list inside main.py
+4. Add URLs to the URL list inside links.csv
 
 5. Run the file
 
