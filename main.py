@@ -2,21 +2,19 @@ import requests
 from bs4 import BeautifulSoup
 import csv
 import os 
+import pandas as pd 
+ 
+# reading CSV file as dataframe and onvert to list
+df = pd.read_csv("links.csv")
+links = df['links'].tolist()
 
-urls = [
-    "https://www.delonghi.com/en/ecam21-117-sb-magnifica-s-bean-to-cup-coffee-machines/p/ECAM21.117.SB"
-    "https://www.delonghi.com/en/ecam22-110-sb-magnifica-s-automatic-coffee-maker/p/ECAM22.110.SB",
-    "https://www.delonghi.com/en/ecam22-110-b-magnifica-s-automatic-coffee-maker/p/ECAM22.110.B",
-    "https://www.delonghi.com/en/ecam21-117-b/p/ECAM21.117.B", 
-    ]
-for url in urls: 
+for url in links: 
+    print("Current URL:", url)
     model = url.split('/')[-1]
     r = requests.get(url)
 
     soup = BeautifulSoup(r.content, 'html5lib')
-    data = {}
-    labels = []
-    values = []
+    data, labels, values = {"model": model}, [], []
     table = soup.find('div', attrs={'class': 'del-simple-css-accordion__content-desktop'})
     for label in table.findAll('span', attrs = {'class':"del-pdp__specifications__single__label"}):
         labels.append(label.string)
@@ -25,12 +23,15 @@ for url in urls:
     for i in range(len(labels)):
         data[labels[i]] = values[i]
 
-    if not os.path.exists('output'):
-        os.makedirs('output')
+    # Create directory if it does not eixst
+    if not os.path.exists('consolidated'):
+        os.makedirs('consolidated')
 
-    filename = f'output/{model}.csv'
-    with open(filename, 'w', newline='') as f:
-        w = csv.DictWriter(f,['specification', 'data'])
+    # Create csv file 
+    with open(f'consolidated/{model}.csv', 'w', newline='') as f:
+        w = csv.DictWriter(f,data.keys())
         w.writeheader()
-        for k, v in data.items():
-            w.writerow({'specification': k, 'data': v})
+        w.writerow(data)
+        
+    print("Done with", model)
+    print("")
