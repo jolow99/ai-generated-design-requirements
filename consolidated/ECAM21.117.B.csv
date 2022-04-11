@@ -1,2 +1,2 @@
-model,Dimensions (wxdxh) (mm),Weight (Kg),Pump pressure (bar),Beans container capacity (g),Water container capacity (l),Grounds container capacity (n),Energy class,Max cup height (mm),Input power (W),Rated voltage/Frequency (V~Hz)
+model,Dimensions (wxdxh) (mm),Weight (Kg),Pump pressure (bar),Beans container capacity (g),Water container capacity (l),Grounds container capacity (n),Energy class,Maximum cup height (mm),Input power (W),Rated voltage/Frequency (V~Hz)
 ECAM21.117.B,238x430x340,9,15,250,1.8,14,Better than A,142,1450,220-240 V / 50-60 Hz
