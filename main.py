@@ -29,6 +29,8 @@ for url in links:
             label.string = "Pump pressure (bar)"
         if label.string == "Max cup height (mm)":
             label.string = "Maximum cup height (mm)"
+        if label.string == "Water container capacity (l)": 
+            label.string = "Water tank capacity (l)"
         labels.append(label.string)
     for value in table.findAll('span', attrs = {'class':"del-pdp__specifications__single__value"}):
         if value.string != None: 
