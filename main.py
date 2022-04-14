@@ -9,12 +9,16 @@ df = pd.read_csv("links.csv")
 links = df['links'].tolist()
 stoplinks = ["https://www.delonghi.com/en/ec9355-bm-la-specialista-prestigio-manual-espresso-maker/p/EC9355.BM"]
 
-for url in links: 
-    print("Current URL:", url)
+for url in links:
+    series = url.split('/')[-3]
     model = url.split('/')[-1]
+    print("Current URL:", url)
+    print("Current Series:", series)
+    print("Current Model:", model)
+
     r = requests.get(url)
     soup = BeautifulSoup(r.content, 'html5lib')
-    data, labels, values = {"model": model}, [], []
+    data, labels, values = {"url": url, "series": series, "model": model}, [], []
     
     if url not in stoplinks: 
         table = soup.find('div', attrs={'class': 'del-simple-css-accordion__content-desktop'})
@@ -34,13 +38,13 @@ for url in links:
         labels.append(label.string)
     for value in table.findAll('span', attrs = {'class':"del-pdp__specifications__single__value"}):
         if value.string != None: 
-            print("Value:",value)
+            # print("Value:",value.string)
             values.append(value.string.strip())
         else: 
-            print("Value:",value)
+            # print("Value:",value)
             energy_class = value.i["class"][-1]
             energy_class_label = energy_class[-1]
-            print(energy_class_label)
+            # print(energy_class_label)
             values.append(energy_class_label)
     for i in range(len(labels)):
         data[labels[i]] = values[i]
