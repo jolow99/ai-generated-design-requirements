@@ -2,3 +2,4 @@ venv
 output
 chromedriver
 consolidated
+__pycache__/

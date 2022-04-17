@@ -35,6 +35,7 @@ product_all_comments = {
 
 
 def isUsabilityRelated(comment):
+    # Bert-Zeroshot with candidates = ["usabile", "not usable"]
     return random.choice([True, False])
 
 
@@ -55,8 +56,8 @@ for product, comments in product_all_comments.items():
 
 
 def usabilitySentiment(comment):
+    # Use Bert_sentiment analysis (Either use negative, neutral or positive)
     return random.randint(-5, 5)
-
 
 product_usability_comments_sentiments = {}
 for product, comments in product_usability_comments.items():
