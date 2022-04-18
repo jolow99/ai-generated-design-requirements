@@ -24,4 +24,4 @@ def getUsabilitySentiment(comments):
             print(result) # Should not happen
     average = sum / n
     print(average)
-    return average
+    return average, results

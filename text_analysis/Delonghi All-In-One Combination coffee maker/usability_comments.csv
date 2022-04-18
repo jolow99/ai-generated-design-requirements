@@ -1,0 +1,6 @@
+,sequence,labels,scores
+0,hello when will the product go on sale in turkey do you have any information where can i order it,"['usable', 'not usable']","[0.9707432985305786, 0.02925666980445385]"
+1,thanks for the review i am gon na buy it,"['usable', 'not usable']","[0.9897043704986572, 0.010295639745891094]"
+2,thanks for the video the tamper is 51mm greeting from per,"['usable', 'not usable']","[0.9803581833839417, 0.019641797989606857]"
+3,hey is there a specific brand of pod i should buy,"['usable', 'not usable']","[0.8809880018234253, 0.11901199072599411]"
+4,can you use normal dust coffeee on this machine,"['usable', 'not usable']","[0.9883579611778259, 0.011642061173915863]"

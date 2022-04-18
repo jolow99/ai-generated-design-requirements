@@ -1,0 +1,6 @@
+,sequence,labels,scores
+0,it is not hot enough,"['not usable', 'usable']","[0.8959863781929016, 0.10401356965303421]"
+1,is there possibiity to make a coffe from the bed without standing out form the bed i mean do i have to stand up to attach container with the milk from fridge to the primadonna coffee maker,"['usable', 'not usable']","[0.800306499004364, 0.19969353079795837]"
+2,how heavy is this,"['usable', 'not usable']","[0.9307811260223389, 0.06921883672475815]"
+3,delonghi primadonna soul or siemens eq9 s700 which is better,"['usable', 'not usable']","[0.826422929763794, 0.17357704043388367]"
+4,doe the coffee come out hot at what temperature,"['usable', 'not usable']","[0.9496533274650574, 0.05034669488668442]"

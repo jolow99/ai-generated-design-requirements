@@ -1,5 +1,6 @@
 import random
 from transformers import pipeline
+import pandas as pd
 
 candidates = ["usable", "not usable"]
 classifier = pipeline("zero-shot-classification")
@@ -14,4 +15,5 @@ def getUsabilityComments(comments):
         max_index = result['scores'].index(max_value)
         if result['labels'][max_index] == 'usable':
             usability_comments.append(result['sequence']) 
-    return usability_comments
+
+    return usability_comments, results
