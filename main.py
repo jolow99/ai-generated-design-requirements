@@ -1,63 +1,77 @@
-import requests
-from bs4 import BeautifulSoup
-import csv
-import os 
 import pandas as pd 
- 
-# reading CSV file as dataframe and convert to list
-df = pd.read_csv("links.csv")
-links = df['links'].tolist()
-stoplinks = ["https://www.delonghi.com/en/ec9355-bm-la-specialista-prestigio-manual-espresso-maker/p/EC9355.BM"]
+import time
+from utilities.usability import usabilityCategorisation
+from utilities.sentiment import usabilitySentiment
 
-for url in links:
-    series = url.split('/')[-3]
-    model = url.split('/')[-1]
-    print("Current URL:", url)
-    print("Current Series:", series)
-    print("Current Model:", model)
 
-    r = requests.get(url)
-    soup = BeautifulSoup(r.content, 'html5lib')
-    data, labels, values = {"url": url, "series": series, "model": model}, [], []
-    
-    if url not in stoplinks: 
-        table = soup.find('div', attrs={'class': 'del-simple-css-accordion__content-desktop'})
-    else: 
-        # hot-fix for one product
-        table = soup.find_all('div', attrs={'class': 'del-simple-css-accordion__content-desktop'})[1]
+brand = "Delonghi "
+series = ["All-In-One Combination coffee maker", "Stilosa", "La Specialista", 'Magnifica', "Dinamica", "Eletta", "Prima Donna", "Dedica","Icona", "Lattissima", "VertuoNext", "Maestosa", "Perfecta", "Clessidra"]
+search_terms = [brand + s for s in series]
 
-    for label in table.findAll('span', attrs = {'class':"del-pdp__specifications__single__label"}):
-        if label.string == "Dimensions (wxdxh-mm) without filter holder" or label.string == "Dimensions (wxdxh)": 
-            label.string = "Dimensions (wxdxh) (mm)"
-        if label.string == "Pump pressure":
-            label.string = "Pump pressure (bar)"
-        if label.string == "Max cup height (mm)":
-            label.string = "Maximum cup height (mm)"
-        if label.string == "Water container capacity (l)": 
-            label.string = "Water tank capacity (l)"
-        labels.append(label.string)
-    for value in table.findAll('span', attrs = {'class':"del-pdp__specifications__single__value"}):
-        if value.string != None: 
-            # print("Value:",value.string)
-            values.append(value.string.strip())
-        else: 
-            # print("Value:",value)
-            energy_class = value.i["class"][-1]
-            energy_class_label = energy_class[-1]
-            # print(energy_class_label)
-            values.append(energy_class_label)
-    for i in range(len(labels)):
-        data[labels[i]] = values[i]
+start= time.time()
+data = {}
+countdown = len(search_terms)
 
-    # Create directory if it does not eixst
-    if not os.path.exists('consolidated'):
-        os.makedirs('consolidated')
+# Step A: For each search term, get all youtube comments of top 5 videos by running code 1 and code 2, then using the clean_comments csv file
 
-    # Create csv file 
-    with open(f'consolidated/{model}.csv', 'w', newline='') as f:
-        w = csv.DictWriter(f,data.keys())
-        w.writeheader()
-        w.writerow(data)
-            
-        print("Done with", model)
-        print("")
+# Step B1: Read CSV Files
+for product in search_terms:
+    df = pd.read_csv(f"text_analysis/{product}/clean_comments.csv")
+    df = df.iloc[:, 1:]
+    df = df.dropna(how='all')
+
+    # convert df to list by merging the list of lists into one list if item is not nan. 
+    comments = df.values.tolist()
+    comments = [item for sublist in comments for item in sublist if not isinstance(item, float)]
+
+    data[product] = comments
+
+# Step B2: Drop comments which are not related to usability
+product_all_comments = data
+product_usability_comments = {}
+for product, comments in product_all_comments.items():
+    print("Remaining: ", countdown)
+    usability_comments, results = getUsabilityComments(comments[:5])
+    product_usability_comments[product] = usability_comments
+    countdown -= 1
+
+    # Save results into csv 
+    df = pd.DataFrame.from_dict(results)
+    df.to_csv(f"text_analysis/{product}/usability_comments.csv")
+
+
+# Step B3: For each usability comment in each search term, rate the comment by running sentiment analysis
+product_usability_score = {}
+for product, comments in product_usability_comments.items():
+    score, results = getUsabilitySentiment(comments)
+    product_usability_score[product] = score
+    # Save results into csv 
+    df = pd.DataFrame.from_dict(results)
+    df.to_csv(f"text_analysis/{product}/usability_sentiment.csv")
+
+print(product_usability_score)
+end = time.time()
+print("time taken", end-start)
+
+# Save final product_usability_score into csv
+df = pd.DataFrame.from_dict(product_usability_score, orient="index", columns=["score"])
+df.to_csv("text_analysis/product_usability_score.csv")
+
+# Step C: Plot n-dimensional graph surface thingy to find the optimum feature combination and we're done! 
+
+
+
+
+# {'Delonghi All-In-One Combination coffee maker': -0.2, 
+# 'Delonghi Stilosa': 0.3333333333333333, 
+# 'Delonghi La Specialista': -0.3333333333333333, 
+# 'Delonghi Magnifica': 0.0, 
+# 'Delonghi Dinamica': -0.5, 
+# 'Delonghi Eletta': 0.2, 
+# 'Delonghi Prima Donna': -1.0, 
+# 'Delonghi Dedica': 0.2, 
+# 'Delonghi Lattissima': 0.5, 
+# 'Delonghi VertuoNext': 0.6, 
+# 'Delonghi Maestosa': 0.2, 
+# 'Delonghi Perfecta': -0.6, 
+# 'Delonghi Clessidra': 0.2}

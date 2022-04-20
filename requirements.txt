@@ -5,3 +5,8 @@ pandas
 webdriver-manager
 transformers
 tensorflow
+google-api-python-client
+nltk
+sklearn
+textblob
+wordcloud
