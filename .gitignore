@@ -2,3 +2,5 @@ venv
 output
 chromedriver
 __pycache__/
+youtube/__pycache__/
+youtube/config.py

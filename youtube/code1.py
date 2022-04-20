@@ -2,13 +2,15 @@ from googleapiclient.discovery import build
 import pickle
 import os
 import pandas as pd
+# import apikey from config
+import config
 
 
 def code1(search_terms, max_result):
     '''user inputs'''
     search_terms = search_terms           # INSERT Search words
     max_result = max_result                                 # No. of results (1-50)
-    api_key = 'AIzaSyBOCdAGlkUG5UI642aomYCiaBGlZxip0G8'
+    api_key = config.apikey
     # Copy & Paste
 
 

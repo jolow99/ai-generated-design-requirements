@@ -1,0 +1,6 @@
+,sequence,labels,scores
+0,how many cup we can make per day with this machine,"['usablity', 'not usability']","[0.965488076210022, 0.03451189771294594]"
+1,it is for home use so not really more than 10 15 a day,"['usablity', 'not usability']","[0.9628021717071533, 0.03719787672162056]"
+2,doe the coffee hopper need to be filled with bean for the grinder to work i can not get the grinder to work when i install the filter,"['not usability', 'usablity']","[0.6064074635505676, 0.39359262585639954]"
+3,yes it doe to avoid damaging the grinder,"['usablity', 'not usability']","[0.901078999042511, 0.09892100095748901]"
+4,yes do not use without grinder full,"['not usability', 'usablity']","[0.8127469420433044, 0.18725308775901794]"
