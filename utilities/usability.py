@@ -2,7 +2,7 @@ import random
 from transformers import pipeline
 import pandas as pd
 
-candidates = ["usablity", "not usability"]
+candidates = ["usability", "not usability", "video"]
 classifier = pipeline("zero-shot-classification")
 print("After pipeline")
 
@@ -14,7 +14,7 @@ def usabilityClassifier(text):
         print(result)
         max_value = max(result["scores"])
         max_index = result['scores'].index(max_value)
-        if result['labels'][max_index] == 'usablity':
+        if result['labels'][max_index] == 'usability':
             usability_text.append(result['sequence']) 
 
     return usability_text, results

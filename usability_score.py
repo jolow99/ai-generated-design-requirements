@@ -1,24 +1,21 @@
 import pandas as pd 
 import time
 from utilities.usability import usabilityClassifier
-from utilities.sentiment import usabilitySentiment
+from utilities.sentiment import averageSentiment
 
+#     "Delonghi Maestosa" removed due to insufficient videos on youtube
 
 products = [
-    "Delonghi All-In-One Combination coffee maker", 
-    "Delonghi Clessidra", 
     "Delonghi Dedica",
     "Delonghi Dinamica",
     "Delonghi Eletta",
     "Delonghi Icona",
     "Delonghi La Specialista",
     "Delonghi Lattissima",
-    "Delonghi Maestosa",
     "Delonghi Magnifica",
     "Delonghi Perfecta",
     "Delonghi Prima Donna",
     "Delonghi Stilosa",
-    "Delonghi Vertuo Next"
     ]
 
 start= time.time()
@@ -31,20 +28,24 @@ countdown = len(products)
 for product in products:
     df = pd.read_csv(f"youtube/support/{product}/clean_comments.csv")
     df = df.iloc[:, 1:]
-    df = df.dropna(how='all')
+    df = df.dropna(how="all")
 
     # convert df to list by merging the list of lists into one list if item is not nan. 
     comments = df.values.tolist()
-    comments = [item for sublist in comments for item in sublist if not isinstance(item, float)]
+    all_comments = []
+    for sublist in comments:
+        for item in sublist:
+            if isinstance(item,str):
+                all_comments.append(item)
 
-    data[product] = comments
+    data[product] = all_comments
 
-# Step B2: Drop comments which are not related to usability
+# # Step B2: Drop comments which are not related to usability
 product_all_comments = data
 product_usability_comments = {}
-for product, comments in product_all_comments.items():
-    print("Remaining: ", countdown)
-    usability_comments, results = usabilityClassifier(comments[:5])
+for product, product_comments in product_all_comments.items():
+    print(f"Currently on {product}, Remaining: {countdown}")
+    usability_comments, results = usabilityClassifier(product_comments)
     product_usability_comments[product] = usability_comments
     countdown -= 1
 
@@ -55,9 +56,13 @@ for product, comments in product_all_comments.items():
 
 # Step B3: For each usability comment in each search term, rate the comment by running sentiment analysis
 product_usability_score = {}
+countdown = len(products)
 for product, comments in product_usability_comments.items():
-    score, results = usabilitySentiment(comments)
+    print(f"Currently on {product}, Remaining: {countdown}")
+    print(" ")
+    score, results = averageSentiment(comments)
     product_usability_score[product] = score
+    countdown -= 1
     # Save results into csv 
     df = pd.DataFrame.from_dict(results)
     df.to_csv(f"youtube/support/{product}/usability_sentiment.csv")
@@ -69,21 +74,3 @@ print("time taken", end-start)
 # Save final product_usability_score into csv
 df = pd.DataFrame.from_dict(product_usability_score, orient="index", columns=["score"])
 df.to_csv("youtube/support/product_usability_score.csv")
-
-# Step C: Plot n-dimensional graph surface thingy to find the optimum feature combination and we're done! 
-
-
-
-# {'Delonghi All-In-One Combination coffee maker': -0.2, 
-# 'Delonghi Stilosa': 0.3333333333333333, 
-# 'Delonghi La Specialista': -0.3333333333333333, 
-# 'Delonghi Magnifica': 0.0, 
-# 'Delonghi Dinamica': -0.5, 
-# 'Delonghi Eletta': 0.2, 
-# 'Delonghi Prima Donna': -1.0, 
-# 'Delonghi Dedica': 0.2, 
-# 'Delonghi Lattissima': 0.5, 
-# 'Delonghi VertuoNext': 0.6, 
-# 'Delonghi Maestosa': 0.2, 
-# 'Delonghi Perfecta': -0.6, 
-# 'Delonghi Clessidra': 0.2}

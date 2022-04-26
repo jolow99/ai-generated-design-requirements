@@ -1,80 +1,112 @@
 import pandas as pd 
 import time
-from usability import getUsabilityComments
-from sentiment import getUsabilitySentiment
+from utilities.sentiment2 import specificationSentiment
 
-def main():
-    brand = "Delonghi "
-    series = ["All-In-One Combination coffee maker", "Stilosa", "La Specialista", 'Magnifica', "Dinamica", "Eletta", "Prima Donna", "Dedica","Icona", "Lattissima", "VertuoNext", "Maestosa", "Perfecta", "Clessidra"]
-    search_terms = [brand + s for s in series]
+# List of usable products
+products = [
+    "Delonghi Dedica",
+    "Delonghi Dinamica",
+    "Delonghi Eletta",
+    "Delonghi Icona",
+    "Delonghi La Specialista",
+    "Delonghi Lattissima",
+    "Delonghi Magnifica",
+    "Delonghi Perfecta",
+    "Delonghi Prima Donna",
+    "Delonghi Stilosa",
+    ]
+features = ["size","weight", "cup height","pump pressure", "water tank", "power"]
 
-    start= time.time()
-    data = {}
-    countdown = len(search_terms)
+start= time.time()
+data = {}
+countdown = len(products)
 
-    # Step A: Get amazon reviews if each delonghi product line
+# Step C1: Read CSV Files of all comments
+for product in products:
+    df = pd.read_csv(f"youtube/support/{product}/clean_comments.csv")
+    df = df.iloc[:, 1:]
+    # df = df.dropna(how='all')
 
-    # Step B1: Read CSV Files
-    for product in search_terms:
-        if product == "Delonghi Maestosa":
+    # convert df to list by merging the list of lists into one list if item is not nan. 
+    comments = df.values.tolist()
+    comments = [item for sublist in comments for item in sublist if not isinstance(item, float)]
+
+    data[product] = comments
+
+keywords = {
+    "Volume (m^3)": ["volume", "dimensions","size"],
+    "Weight (Kg)" : ["heavy","bulky", "move", "shift", "clunky", "light"],
+    "Maximum cup height (mm)": ["cup", "glass", "fits", "tall"],
+    "Pump pressure (bar)": ["pump", "pressure", "bars","rotary","vibratory", "force"],
+    "Water tank capacity (l)": ["water", "tank", "capacity", "litres", "refill"],
+    "Input power (W)": ["power", "electricity", "wattage", "watts", "energy","rating","draw","current"]
+}
+
+# Step C2: Categorise comments relating to each individual feature 
+product_all_comments = data
+product_feature_comments = {}
+for product, comments in product_all_comments.items():
+    print(f"Currently on {product}, Remaining: {countdown} products")
+    print(f"Analysing a total of {len(comments)} comments")
+    feature_comments = {
+    "Volume (m^3)": [],
+    "Weight (Kg)" : [],
+    "Maximum cup height (mm)": [],
+    "Pump pressure (bar)": [],
+    "Water tank capacity (l)": [],
+    "Input power (W)": []
+}
+
+    for comment in comments: 
+        feature_score = {
+            "Volume (m^3)": 0,
+            "Weight (Kg)" : 0,
+            "Maximum cup height (mm)": 0,
+            "Pump pressure (bar)": 0,
+            "Water tank capacity (l)": 0,
+            "Input power (W)": 0
+        }
+        if isinstance(comment, bool):
             continue
-        print("Product:", product)
-        df = pd.read_csv(f"text_analysis/{product}/reviews.csv")
-        # convert df to list by merging the list of lists into one list if item is not nan. 
-        reviews = df["Review Description"].tolist()
-        data[product] = reviews
+        for feature, words in keywords.items():
+            for word in words:
+                if word in comment.lower():
+                    feature_score[feature] += 1
+        # Get the key of the maximum feature_score
+        max_feature = max(feature_score, key=feature_score.get)
+        if feature_score[max_feature] > 1:
+            feature_comments[max_feature].append(comment)
+    product_feature_comments[product] = feature_comments
+    countdown -= 1
 
-    # Step B2: Drop comments which are not related to usability
-    product_all_reviews = data
-    product_usability_reviews = {}
-    for product, reviews in product_all_reviews.items():
-        print("Remaining: ", countdown)
-        print("Product:", product)
-        usability_reviews, results = getUsabilityComments(reviews[:10])
-        product_usability_reviews[product] = usability_reviews
-        countdown -= 1
+print("Step C2 done")
+for product, features in product_feature_comments.items():
+    for feature, comments in features.items():
+        print(f"{product} {feature} has {len(comments)} comments")
 
-        # Save results into csv 
-        df = pd.DataFrame.from_dict(results)
-        df.to_csv(f"text_analysis/{product}/usability_reviews.csv")
+# Save results into csv
+df = pd.DataFrame.from_dict(product_feature_comments)
+df.to_csv(f"youtube/support/product_feature_comments.csv")
 
-
-    # Step B3: For each usability comment in each search term, rate the comment by running sentiment analysis
-    product_usability_score = {}
-    for product, reviews in product_usability_reviews.items():
-        print("Product:", product)
-        score, results = getUsabilitySentiment(reviews)
-        product_usability_score[product] = score
-        # Save results into csv 
-        df = pd.DataFrame.from_dict(results)
-        df.to_csv(f"text_analysis/{product}/review_usability_sentiment.csv")
-
-    print(product_usability_score)
-    end = time.time()
-    print("time taken", end-start)
-
-    # Save final product_usability_score into csv
-    df = pd.DataFrame.from_dict(product_usability_score, orient="index", columns=["score"])
-    df.to_csv("text_analysis/product_usability_review_score.csv")
-
-    # # Step C: Plot n-dimensional graph surface thingy to find the optimum feature combination and we're done! 
-
-
-
-
-    # # {'Delonghi All-In-One Combination coffee maker': -0.2, 
-    # # 'Delonghi Stilosa': 0.3333333333333333, 
-    # # 'Delonghi La Specialista': -0.3333333333333333, 
-    # # 'Delonghi Magnifica': 0.0, 
-    # # 'Delonghi Dinamica': -0.5, 
-    # # 'Delonghi Eletta': 0.2, 
-    # # 'Delonghi Prima Donna': -1.0, 
-    # # 'Delonghi Dedica': 0.2, 
-    # # 'Delonghi Lattissima': 0.5, 
-    # # 'Delonghi VertuoNext': 0.6, 
-    # # 'Delonghi Maestosa': 0.2, 
-    # # 'Delonghi Perfecta': -0.6, 
-    # # 'Delonghi Clessidra': 0.2}
-
-if __name__ == "__main__":
-    main()
+# Step C3: Run sentiment analysis on each product's feature comments
+product_feature_sentiment = {}
+for product, features in product_feature_comments.items():
+    print(f"Currently on {product}, Remaining: {countdown}")
+    feature_sentiment = {
+        "size": 0,
+        "weight" : 0,
+        "cup": 0,
+        "pump": 0,
+        "water": 0,
+        "power": 0
+    }
+    for feature, comments in features.items():
+        print(len("Comments"))
+        average, result = specificationSentiment(comments)
+        feature_sentiment[feature] = average
+    product_feature_sentiment[product] = feature_sentiment
+    countdown -= 1
+    
+# Save results into csv
+df = pd.DataFrame.from_dict(product_feature_sentiment)
+df.to_csv(f"youtube/support/product_feature_sentiment.csv")

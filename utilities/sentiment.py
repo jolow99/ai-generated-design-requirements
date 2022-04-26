@@ -4,25 +4,27 @@ print("Setting up")
 classifier = pipeline('sentiment-analysis')
 print("Done")
 
-def usabilitySentiment(text):
-    print("Evaluating:", text)
-    results =  classifier(text)
-    print("Results: ", results)
-    # Take the average score. If label is 'NEGATIVE', score should be negative.
-    # If label is 'POSITIVE', score should be positive.
-    # If label is 'NEUTRAL', score should be 0.
-    print("Results len", len(results))
-    n = len(text)
-    print("n", n)
+def averageSentiment(text):
+    reduced_text = []
+    for word in text: 
+        if len(word) > 512:
+            reduced_text.append(word[:512])
+        else:
+            reduced_text.append(word)
+    results = classifier(reduced_text)
     sum = 0
     for result in results:
-        print(result)
         if result['label'] == 'POSITIVE':
             sum += 1
         elif result['label'] == 'NEGATIVE':
-            sum -= 1
+                sum -= 1
         else: 
+            print("Error")
             print(result) # Should not happen
-    average = sum / n
-    print(average)
+
+    if len(results) == 0:
+        return None, None
+    average = sum / len(results)
+    print("Average:", average)
+    print("All Results", results)
     return average, results

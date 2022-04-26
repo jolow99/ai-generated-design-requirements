@@ -4,24 +4,20 @@ import pandas as pd
 
 def main(): 
     products = [
-    "Delonghi All-In-One Combination coffee maker", 
-    "Delonghi Clessidra", 
     "Delonghi Dedica",
     "Delonghi Dinamica",
     "Delonghi Eletta",
     "Delonghi Icona",
     "Delonghi La Specialista",
     "Delonghi Lattissima",
-    "Delonghi Maestosa",
     "Delonghi Magnifica",
     "Delonghi Perfecta",
-    "Delonghi Prima Donn",
+    "Delonghi Prima Donna",
     "Delonghi Stilosa",
-    "Delonghi Vertuo Next"
     ]
 
     for product in products: 
-        max_result = 5
+        max_result = 20
         code1(product, max_result)
         code2()
 
