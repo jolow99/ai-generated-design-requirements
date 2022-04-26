@@ -30,3 +30,4 @@ There are 3 folders in the project:
 `` pip install -r requirements.txt``
 
 ## Read More
+Link to writeup: https://drive.google.com/file/d/11igVLhA9fY53A6Flj9kTV4mrz4LmEv2q/view?usp=sharing
